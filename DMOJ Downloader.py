@@ -14,8 +14,15 @@ def toFileName(name):
                 name=name.replace(i, d[i])
         return name
 def saveProblem(group, name, language, text):
+    '''
+    print("Saving problem: ", group, name, language)
+    print(group+"\\"+toFileName(name)+extension(language))
+    print(text[7704:7706])
+    print(text.encode('cp1252', errors='replace'))
+    print(sys.stdout.encoding)
+    '''
     f = open(group+"\\"+toFileName(name)+extension(language), "w")
-    f.write(text)
+    f.write(text.encode('cp1252', errors='replace').decode('cp1252'))
     f.close()
 header = {
     "Cookie":"__cfduid=d8180733d92c26f37e878e05c6bf29b571514424893; _ga=GA1.2.922297959.1514424903; csrftoken=Zd4XXAisQKR2m4yQTTuh2WewMOFB87X3vfdgtNftD8O7qlE9u0I4Cc6VkUCQ6lY5; sessionid=ty8s2yo1xwlrva56aqq85rxf0mkyyb6e; _gid=GA1.2.131376195.1516556958; _gat=1" #whatever your Cookie header is
@@ -42,7 +49,7 @@ best = {x:ac[x] for x in ac if fs[ac[x]['problem']]==ac[x]['time']}
 groups = set(problems[best[x]['problem']]['group'] for x in best)
 for name in groups:
     os.makedirs(name, exist_ok=True)
-cnt  = 0
+cnt = 0
 for i in best:
         p = problems[best[i]['problem']]
         r = getSubmission(i)

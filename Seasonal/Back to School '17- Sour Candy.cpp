@@ -1,106 +1,249 @@
-#include <cstdio>
-#include <algorithm>
-#include <vector>
-#define pi pair<int,int>
-using namespace std;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Login - DMOJ: Modern Online Judge</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="keywords" content="DMOJ,Canadian,Don Mills,DMCI,online judge,programming,code,contest,CCC,CCC Solutions,CCC 2015,IOI,JOI,COCI,DMOPC,Canada,Ontario,Toronto,grade,interactive">
+<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
 
-int n, orig[100001], target[100001], origPos[100001], targetPos[100001], frontCount[100001], backCount[100001];
-vector<pi> sourness;
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#FFBB33">
+<meta name="msapplication-TileImage" content="/mstile-144x144.png">
+<meta name="theme-color" content="#FFBB33">
+<meta property="og:site_name" content="DMOJ: Modern Online Judge">
+<meta property="og:url" content="https://dmoj.ca/accounts/login/?next=/src/592522/raw">
+<!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script>window.bad_browser = true</script>
+    <![endif]-->
+<link rel="stylesheet" href="//dmoj.algome.me/static/cache/css/5405fbc8cd00.css" type="text/css" /> <link rel="canonical" href="https://dmoj.ca/accounts/login/?next=/src/592522/raw">
+<style>
+        #login-panel {
+            position: relative;
+            margin: 5em auto auto -10em;
+            top: 40%;
+            left: 50%;
+        }
 
-int shift(int i, bool front)
-{
-	int ans = 0;
-	if (front)
-		for (; i >= 1; i -= i&-i)
-			ans += frontCount[i];
-	else
-		for (; i >= 1; i -= i&-i)
-			ans += backCount[i];
-	return ans;
-}
+        h4 {
+            padding-top: 1em;
+        }
 
-void increment(int i, int inc, bool front)
-{
-	if (front)
-		for (; i <= n; i += i&-i)
-			frontCount[i] += inc;
-	else
-		for (; i <= n; i += i&-i)
-			backCount[i] += inc;
-}
+        .social {
+            display: inline;
+            font-size: 2.3em;
+            float: none;
+        }
 
-bool comp(pi i, pi j) { return i.first < j.first; }
+        .google-icon i {
+            color: #DD4B38;
+        }
 
-int main()
-{
-	scanf("%d", &n);
-	int temp;
-	for (int i = 1; i <= n; i++)
-	{
-		scanf("%d", &temp);
-		sourness.push_back(make_pair(temp, i));
-	}
-	sort(sourness.begin(), sourness.end(), comp);
-	for (int i=0; i<n;i++)
-	{
-		pi p = sourness[i];
-		orig[p.second] = i+1;
-		origPos[i+1] = p.second;
-	}
-	sourness.clear();
-	for (int i = 1; i <= n; i++)
-	{
-		scanf("%d", &temp);
-		sourness.push_back(make_pair(temp, i));
-	}
-	sort(sourness.begin(), sourness.end(), comp);
-	for (int i = 0; i < n; i++)
-	{
-		pi p = sourness[i];
-		target[p.second] = i+1;
-		targetPos[i+1] = p.second;
-	}
+        .facebook-icon i {
+            color: #133783;
+        }
 
-	int lastPos = -1, maxLength = 0, length = 0, maxX, x, pos;
-	for (int i = 1; i <= n; i++)
-	{
-		x = target[i];
-		pos = origPos[x];
-		if (pos > lastPos)
-		{
-			++length;
-			if (length > maxLength)
-			{
-				maxLength = length;
-				maxX = x;
-			}
-		}
-		else
-			length = 1;
-		lastPos = pos;
-	}
+        .github-icon i {
+            color: black;
+        }
 
-	printf("%d", n - maxLength);
+        .dropbox-icon i {
+            color: #55ACEE;
+        }
+    </style>
+<script type="text/javascript" src="//dmoj.algome.me/static/cache/js/4f753e457100.js"></script>
+<script>window.user = {};</script>
+<script>window.user && Raven.setUserContext(window.user)</script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-	int index = targetPos[maxX];
-	vector<int> front, back;
-	for (int i = index - maxLength; i > 0; i--)
-		front.push_back(target[i]);
-	for (int i = index + 1; i <= n; i++)
-		back.push_back(target[i]);
+  ga('create', 'UA-56757436-1', 'auto');
+  ga('require', 'displayfeatures');
+  ga('send', 'pageview');
 
-	for (int i : front)
-	{
-		int realPos = origPos[i] + shift(n + 1 - origPos[i], true);
-		printf("\nF %d", realPos);
-		increment(n + 1 - origPos[i], 1, true);
-	}
-	for (int i : back)
-	{
-		int realPos = origPos[i] + shift(n + 1 - origPos[i], true) - shift(origPos[i], false);
-		printf("\nB %d", realPos);
-		increment(origPos[i], 1, false);
-	}
+</script>
+<noscript>
+        <style>
+            #content {
+                margin: 80px auto auto;
+            }
 
-    return 0;
-}
+            #navigation {
+                top: 27px;
+            }
+        </style>
+    </noscript>
+</head>
+<body>
+<nav id="navigation" class="unselectable">
+<div id="nav-container">
+<a id="navicon" href="javascript:void(0)"><i class="fa fa-bars"></i></a>
+<ul id="nav-list">
+<li class="home-nav-element"><a href="/"><img src="//dmoj.algome.me/static/icons/logo.d0dbdf0b98be.svg" alt="DMOJ" width="160" height="44" onerror="this.src=&quot;//dmoj.algome.me/static/icons/logo.2f426bc39826.png&quot;; this.onerror=null" style="border: none"></a></li>
+<li class="home-nav-element"><span class="nav-divider"></span></li>
+<li class="home-menu-item"><a href="/" class="nav-home">Home</a></li>
+<li>
+<a href="/problems/" class="nav-problem">
+Problems
+</a>
+</li>
+<li>
+<a href="/submissions/" class="nav-submit">
+Submissions
+</a>
+</li>
+<li>
+<a href="/users/" class="nav-user">
+Users
+</a>
+</li>
+<li>
+<a href="/contests/" class="nav-contest">
+Contests
+</a>
+</li>
+<li>
+<a href="/about/" class="nav-about">
+About
+</a>
+<ul> <li>
+<a href="/status/" class="nav-status">
+Status
+</a>
+</li>
+<li>
+<a href="/tips/" class="nav-tips">
+Tips
+</a>
+</li>
+<li>
+<a href="/api/" class="nav-api">
+API
+</a>
+</li>
+<li>
+<a href="https://github.com/DMOJ" class="nav-github">
+Github
+</a>
+</li>
+</ul> </li>
+</ul>
+<span id="user-links">
+<span class="anon">
+<a href="/accounts/login/?next=">
+<b>Login</b>
+</a>&nbsp;|&nbsp;<a href="/accounts/register/">Register</a>
+</span>
+</span>
+</div>
+<div id="nav-shadow"></div>
+</nav>
+<div id="page-container">
+<noscript>
+        <div id="noscript">This site works best with JavaScript enabled.</div>
+    </noscript>
+<br>
+<main id="content">
+<h2 style="color:#393630; display:inline">
+Login </h2>
+<hr>
+<div id="content-body"> <div id="login-panel">
+<form action="" method="post" class="form-area">
+<input type='hidden' name='csrfmiddlewaretoken' value='1dxmq75LgdKHLSn4je0dr3Mw9DiLAfXWNxp5B99JD3skJ0eVEBVLfyCpJkyNghj8' /> <table border="0" style="text-align:left">
+<tr>
+<th><i class="fa fa-user fa-fw"></i>
+</th>
+<td><input type="text" name="username" autofocus required placeholder="Username" id="id_username" maxlength="254" />
+</td>
+</tr>
+<tr>
+<th><i class="fa fa-key fa-fw"></i>
+</th>
+<td><input type="password" name="password" required placeholder="Password" id="id_password" />
+</td>
+</tr>
+</table>
+<hr>
+<button style="float:right;" type="submit">Login!</button>
+<input type="hidden" name="next" value="/src/592522/raw">
+</form>
+<br><a href="/accounts/password/reset/">Forgot your password?</a>
+<h4>Or log in with...</h4>
+<a href="/login/google-oauth2/?next=/src/592522/raw" class="social google-icon">
+<i class="fa fa-google-plus-square"></i>
+</a>
+<a href="/login/facebook/?next=/src/592522/raw" class="social facebook-icon">
+<i class="fa fa-facebook-square"></i>
+</a>
+<a href="/login/github-secure/?next=/src/592522/raw" class="social github-icon">
+<i class="fa fa-github-square"></i>
+ </a>
+<a href="/login/dropbox-oauth2/?next=/src/592522/raw" class="social dropbox-icon">
+<i class="fa fa-dropbox"></i>
+</a>
+</div>
+</div>
+</main>
+<footer>
+<span id="footer-content">
+<br>
+<a style="color: rgb(128, 128, 128)" href="//github.com/DMOJ/">fork us on <span style="font-weight:bold">Github</span></a> | <a style="color: rgb(128, 128, 128);" href="//www.facebook.com/dmoj.ca">like us on <span style="font-weight: bold;">Facebook</span></a> | <a style="color: rgb(128, 128, 128)" href="https://translate.dmoj.ca/">help us <span style="font-weight: bold;">translate</span></a> | <a style="color: rgb(128, 128, 128)" href="https://dmoj.ca/tos/">terms of service</a> |
+<form action="/i18n/setlang/" method="post" style="display: inline">
+<input type='hidden' name='csrfmiddlewaretoken' value='1dxmq75LgdKHLSn4je0dr3Mw9DiLAfXWNxp5B99JD3skJ0eVEBVLfyCpJkyNghj8' /> <input name="next" type="hidden" value="/accounts/login/?next=/src/592522/raw">
+<select name="language" onchange="form.submit()" style="height: 1.5em">
+<option value="de">
+Deutsch (de)
+</option>
+<option value="en" selected>
+English (en)
+</option>
+<option value="es">
+español (es)
+</option>
+<option value="fr">
+français (fr)
+</option>
+<option value="hr">
+Hrvatski (hr)
+</option>
+<option value="ko">
+??? (ko)
+</option>
+<option value="ro">
+Român? (ro)
+</option>
+<option value="ru">
+??????? (ru)
+</option>
+<option value="sr-latn">
+srpski (latinica) (sr-latn)
+</option>
+<option value="vi">
+Tiê?ng Viê?t (vi)
+</option>
+<option value="zh-hans">
+???? (zh-hans)
+</option>
+</select>
+</form>
+</span>
+</footer>
+</div>
+</body>
+</html>
