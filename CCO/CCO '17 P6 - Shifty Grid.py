@@ -1,249 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>Login - DMOJ: Modern Online Judge</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="keywords" content="DMOJ,Canadian,Don Mills,DMCI,online judge,programming,code,contest,CCC,CCC Solutions,CCC 2015,IOI,JOI,COCI,DMOPC,Canada,Ontario,Toronto,grade,interactive">
-<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
+import sys
+input = sys.stdin.readline
 
-<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
-<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
-<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
-<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
-<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
-<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
-<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
-<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
-<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
-<link rel="manifest" href="/manifest.json">
-<meta name="msapplication-TileColor" content="#FFBB33">
-<meta name="msapplication-TileImage" content="/mstile-144x144.png">
-<meta name="theme-color" content="#FFBB33">
-<meta property="og:site_name" content="DMOJ: Modern Online Judge">
-<meta property="og:url" content="https://dmoj.ca/accounts/login/?next=/src/531888/raw">
-<!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script>window.bad_browser = true</script>
-    <![endif]-->
-<link rel="stylesheet" href="//dmoj.algome.me/static/cache/css/5405fbc8cd00.css" type="text/css" /> <link rel="canonical" href="https://dmoj.ca/accounts/login/?next=/src/531888/raw">
-<style>
-        #login-panel {
-            position: relative;
-            margin: 5em auto auto -10em;
-            top: 40%;
-            left: 50%;
-        }
+def shift(t,rc,shiftAmount): #rc between 0 and n-1 or m-1
+    temp = []
+    if t==1:
+        shiftAmount %= m
+        moves.append((t,rc+1,shiftAmount))
+        for j in range(m):
+            temp.append(array[rc][(j-shiftAmount)%m])
+        for j in range(m):
+            array[rc][j] = temp[j]
+            pos[temp[j]] = (rc,j)
+    else:
+        shiftAmount %= n
+        moves.append((t,rc+1,shiftAmount))
+        for i in range(n):
+            temp.append(array[(i-shiftAmount)%n][rc])
+        for i in range(n):
+            array[i][rc] = temp[i]
+            pos[temp[i]] = (i,rc)
 
-        h4 {
-            padding-top: 1em;
-        }
+def solveRow(row):
+    for target in range(row*m,(row+1)*m-1):
+        shift(1, pos[target][0], -1-pos[target][1]) #moves target to last column
+        if pos[target][0] == row and target != row*m: #if target already in row, move it out of row
+            shift(2, m-1, 1)
+            shift(1, row, -2-pos[target-1][1])
+        shift(2, m-1, row-pos[target][0]) #moves target to correct row
+        shift(1, row, -1) #inserts target in row
 
-        .social {
-            display: inline;
-            font-size: 2.3em;
-            float: none;
-        }
+def solveLastColumn():
+    for target in range(2*m-1, m*n-m, m):
+        if pos[target][1] != m-1: #target in last row, second-last column
+            shift(2, m-1, -2-pos[target-m][0])
+            shift(1, n-1, 1)
+            shift(2, m-1, -1)
+            shift(1, n-1, -1)
+            continue
+        shift(2, m-1, -1-pos[target][0]) #moves target to last row
+        shift(1, n-1, 1) #stores target in last row temporarily
+        shift(2, m-1, -2-pos[target-m][0]) #moves target-m to second-last row
+        shift(1, n-1, -1) #inserts target under target-m
+    shift(2, m-1, -pos[m-1][0]) #aligns column so that m-1 is in correct place
 
-        .google-icon i {
-            color: #DD4B38;
-        }
+def jump2Left(target): #changes ..., x, y, target, ... to ... target, x, y, ...
+    r = pos[target][0] #without changing anything else in the array
+    c = pos[target][1]-1
+    if c <= 0: c += m
+    shift(2, c, 1)
+    shift(1, r, -1)
+    shift(2, c, -1)
+    shift(1, r, 2)
+    shift(2, c, 1)
+    shift(1, r, -1)
+    shift(2, c, -1)
 
-        .facebook-icon i {
-            color: #133783;
-        }
+n,m = map(int,input().split())
+array = []
+moves = []
 
-        .github-icon i {
-            color: black;
-        }
+for i in range(n):
+    array.append(list(map(int,input().split())))
 
-        .dropbox-icon i {
-            color: #55ACEE;
-        }
-    </style>
-<script type="text/javascript" src="//dmoj.algome.me/static/cache/js/4f753e457100.js"></script>
-<script>window.user = {};</script>
-<script>window.user && Raven.setUserContext(window.user)</script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+pos = {}
+for row in range(n):
+    for column in range(m):
+        pos[array[row][column]] = (row,column)
 
-  ga('create', 'UA-56757436-1', 'auto');
-  ga('require', 'displayfeatures');
-  ga('send', 'pageview');
+for row in range(n): #solves the first m-1 elements of each row
+    solveRow(row)
+    
+solveLastColumn()
 
-</script>
-<noscript>
-        <style>
-            #content {
-                margin: 80px auto auto;
-            }
+if array[n-1][m-2] == m*n-1:
+    for _ in range(m//2-1):
+        jump2Left(n*m-1)
+    shift(1, n-1, -1)
 
-            #navigation {
-                top: 27px;
-            }
-        </style>
-    </noscript>
-</head>
-<body>
-<nav id="navigation" class="unselectable">
-<div id="nav-container">
-<a id="navicon" href="javascript:void(0)"><i class="fa fa-bars"></i></a>
-<ul id="nav-list">
-<li class="home-nav-element"><a href="/"><img src="//dmoj.algome.me/static/icons/logo.d0dbdf0b98be.svg" alt="DMOJ" width="160" height="44" onerror="this.src=&quot;//dmoj.algome.me/static/icons/logo.2f426bc39826.png&quot;; this.onerror=null" style="border: none"></a></li>
-<li class="home-nav-element"><span class="nav-divider"></span></li>
-<li class="home-menu-item"><a href="/" class="nav-home">Home</a></li>
-<li>
-<a href="/problems/" class="nav-problem">
-Problems
-</a>
-</li>
-<li>
-<a href="/submissions/" class="nav-submit">
-Submissions
-</a>
-</li>
-<li>
-<a href="/users/" class="nav-user">
-Users
-</a>
-</li>
-<li>
-<a href="/contests/" class="nav-contest">
-Contests
-</a>
-</li>
-<li>
-<a href="/about/" class="nav-about">
-About
-</a>
-<ul> <li>
-<a href="/status/" class="nav-status">
-Status
-</a>
-</li>
-<li>
-<a href="/tips/" class="nav-tips">
-Tips
-</a>
-</li>
-<li>
-<a href="/api/" class="nav-api">
-API
-</a>
-</li>
-<li>
-<a href="https://github.com/DMOJ" class="nav-github">
-Github
-</a>
-</li>
-</ul> </li>
-</ul>
-<span id="user-links">
-<span class="anon">
-<a href="/accounts/login/?next=">
-<b>Login</b>
-</a>&nbsp;|&nbsp;<a href="/accounts/register/">Register</a>
-</span>
-</span>
-</div>
-<div id="nav-shadow"></div>
-</nav>
-<div id="page-container">
-<noscript>
-        <div id="noscript">This site works best with JavaScript enabled.</div>
-    </noscript>
-<br>
-<main id="content">
-<h2 style="color:#393630; display:inline">
-Login </h2>
-<hr>
-<div id="content-body"> <div id="login-panel">
-<form action="" method="post" class="form-area">
-<input type='hidden' name='csrfmiddlewaretoken' value='W1tYvSK34zQ23GyGh0R4LeoeIInD1sPHsrZOiYSGCDygAYxRcNn4OUeiZfuobucQ' /> <table border="0" style="text-align:left">
-<tr>
-<th><i class="fa fa-user fa-fw"></i>
-</th>
-<td><input type="text" name="username" autofocus required placeholder="Username" id="id_username" maxlength="254" />
-</td>
-</tr>
-<tr>
-<th><i class="fa fa-key fa-fw"></i>
-</th>
-<td><input type="password" name="password" required placeholder="Password" id="id_password" />
-</td>
-</tr>
-</table>
-<hr>
-<button style="float:right;" type="submit">Login!</button>
-<input type="hidden" name="next" value="/src/531888/raw">
-</form>
-<br><a href="/accounts/password/reset/">Forgot your password?</a>
-<h4>Or log in with...</h4>
-<a href="/login/google-oauth2/?next=/src/531888/raw" class="social google-icon">
-<i class="fa fa-google-plus-square"></i>
-</a>
-<a href="/login/facebook/?next=/src/531888/raw" class="social facebook-icon">
-<i class="fa fa-facebook-square"></i>
-</a>
-<a href="/login/github-secure/?next=/src/531888/raw" class="social github-icon">
-<i class="fa fa-github-square"></i>
- </a>
-<a href="/login/dropbox-oauth2/?next=/src/531888/raw" class="social dropbox-icon">
-<i class="fa fa-dropbox"></i>
-</a>
-</div>
-</div>
-</main>
-<footer>
-<span id="footer-content">
-<br>
-<a style="color: rgb(128, 128, 128)" href="//github.com/DMOJ/">fork us on <span style="font-weight:bold">Github</span></a> | <a style="color: rgb(128, 128, 128);" href="//www.facebook.com/dmoj.ca">like us on <span style="font-weight: bold;">Facebook</span></a> | <a style="color: rgb(128, 128, 128)" href="https://translate.dmoj.ca/">help us <span style="font-weight: bold;">translate</span></a> | <a style="color: rgb(128, 128, 128)" href="https://dmoj.ca/tos/">terms of service</a> |
-<form action="/i18n/setlang/" method="post" style="display: inline">
-<input type='hidden' name='csrfmiddlewaretoken' value='W1tYvSK34zQ23GyGh0R4LeoeIInD1sPHsrZOiYSGCDygAYxRcNn4OUeiZfuobucQ' /> <input name="next" type="hidden" value="/accounts/login/?next=/src/531888/raw">
-<select name="language" onchange="form.submit()" style="height: 1.5em">
-<option value="de">
-Deutsch (de)
-</option>
-<option value="en" selected>
-English (en)
-</option>
-<option value="es">
-español (es)
-</option>
-<option value="fr">
-français (fr)
-</option>
-<option value="hr">
-Hrvatski (hr)
-</option>
-<option value="ko">
-??? (ko)
-</option>
-<option value="ro">
-Român? (ro)
-</option>
-<option value="ru">
-??????? (ru)
-</option>
-<option value="sr-latn">
-srpski (latinica) (sr-latn)
-</option>
-<option value="vi">
-Tiê?ng Viê?t (vi)
-</option>
-<option value="zh-hans">
-???? (zh-hans)
-</option>
-</select>
-</form>
-</span>
-</footer>
-</div>
-</body>
-</html>
+print(len(moves))
+for (a, b, c) in moves:
+    print(str(a)+' '+str(b)+' '+str(c))

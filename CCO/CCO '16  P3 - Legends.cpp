@@ -1,249 +1,246 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>Login - DMOJ: Modern Online Judge</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="keywords" content="DMOJ,Canadian,Don Mills,DMCI,online judge,programming,code,contest,CCC,CCC Solutions,CCC 2015,IOI,JOI,COCI,DMOPC,Canada,Ontario,Toronto,grade,interactive">
-<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#include <cstring>
+#include <algorithm>
+using namespace std;
 
-<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
-<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
-<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
-<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
-<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
-<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
-<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
-<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
-<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
-<link rel="manifest" href="/manifest.json">
-<meta name="msapplication-TileColor" content="#FFBB33">
-<meta name="msapplication-TileImage" content="/mstile-144x144.png">
-<meta name="theme-color" content="#FFBB33">
-<meta property="og:site_name" content="DMOJ: Modern Online Judge">
-<meta property="og:url" content="https://dmoj.ca/accounts/login/?next=/src/539222/raw">
-<!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script>window.bad_browser = true</script>
-    <![endif]-->
-<link rel="stylesheet" href="//dmoj.algome.me/static/cache/css/5405fbc8cd00.css" type="text/css" /> <link rel="canonical" href="https://dmoj.ca/accounts/login/?next=/src/539222/raw">
-<style>
-        #login-panel {
-            position: relative;
-            margin: 5em auto auto -10em;
-            top: 40%;
-            left: 50%;
-        }
+vector<int> G[100001];
 
-        h4 {
-            padding-top: 1em;
-        }
+int S, T, N, M;
 
-        .social {
-            display: inline;
-            font-size: 2.3em;
-            float: none;
-        }
+int parent[100001];
+int state[100001];
+vector<int> stack;
+unordered_map<int, unordered_set<int> > edgesInCycle;
 
-        .google-icon i {
-            color: #DD4B38;
-        }
+bool cycleOverlap(int w, int v)
+{
+	while (v != w)
+	{
+		if (edgesInCycle[v].find(parent[v]) != edgesInCycle[v].end())
+			return true;
+		edgesInCycle[v].insert(parent[v]);
+		v = parent[v];
+	}
+	return false;
+}
 
-        .facebook-icon i {
-            color: #133783;
-        }
+//true iff G contains cycles that overlap
+bool flask()
+{
+	if (M >= 2 * N - 3 && N >= 4)
+		return true;
+	stack.reserve(N);
+	stack.push_back(1);
 
-        .github-icon i {
-            color: black;
-        }
+	while (!stack.empty())
+	{
+		int v = stack.back();
+		if (state[v] != 0) stack.pop_back();
+		else
+		{
+			bool allChildrenChecked = true;
+			for (const int &w : G[v])
+			{
+				if (state[w] == 0) //tree edge
+				{
+					parent[w] = v;
+					stack.push_back(w);
+					allChildrenChecked = false;
+				}
+				else if (state[w] == 1 && w != parent[v] && cycleOverlap(w, v)) //back edge
+					return true;
+			}
+			if (allChildrenChecked)
+			{
+				state[v] = 2;
+				stack.pop_back();
+			}
+			else state[v] = 1;
+		}
+	}
+	return false;
+}
 
-        .dropbox-icon i {
-            color: #55ACEE;
-        }
-    </style>
-<script type="text/javascript" src="//dmoj.algome.me/static/cache/js/4f753e457100.js"></script>
-<script>window.user = {};</script>
-<script>window.user && Raven.setUserContext(window.user)</script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+//true iff G contains a cycle of length >= 4
+//or two cycles of length 3 that overlap
+bool sun()
+{
+	stack.reserve(N);
+	stack.push_back(1);
 
-  ga('create', 'UA-56757436-1', 'auto');
-  ga('require', 'displayfeatures');
-  ga('send', 'pageview');
+	while (!stack.empty())
+	{
+		int v = stack.back();
+		if (state[v] != 0) stack.pop_back();
+		else
+		{
+			bool allChildrenChecked = true;
+			for (const int &w : G[v])
+			{
+				if (state[w] == 0) //tree edge
+				{
+					parent[w] = v;
+					stack.push_back(w);
+					allChildrenChecked = false;
+				}
+				else if (state[w] == 1 && w != parent[v]) //back edge
+				{
+					if (w != parent[parent[v]]) return true;
+					else if (cycleOverlap(w, v)) return true;
+				}
+			}
+			if (allChildrenChecked)
+			{
+				state[v] = 2;
+				stack.pop_back();
+			}
+			else state[v] = 1;
+		}
+	}
+	return false;
+}
 
-</script>
-<noscript>
-        <style>
-            #content {
-                margin: 80px auto auto;
-            }
+bool checkCycle(int w, int v)
+{
+	vector<int> cycle;
+	int cycleLength = 0;
+	int tmp = v;
+	do
+	{
+		cycle.push_back(tmp);
+		cycleLength++;
+		tmp = parent[tmp];
+	} while (tmp != v);
 
-            #navigation {
-                top: 27px;
-            }
-        </style>
-    </noscript>
-</head>
-<body>
-<nav id="navigation" class="unselectable">
-<div id="nav-container">
-<a id="navicon" href="javascript:void(0)"><i class="fa fa-bars"></i></a>
-<ul id="nav-list">
-<li class="home-nav-element"><a href="/"><img src="//dmoj.algome.me/static/icons/logo.d0dbdf0b98be.svg" alt="DMOJ" width="160" height="44" onerror="this.src=&quot;//dmoj.algome.me/static/icons/logo.2f426bc39826.png&quot;; this.onerror=null" style="border: none"></a></li>
-<li class="home-nav-element"><span class="nav-divider"></span></li>
-<li class="home-menu-item"><a href="/" class="nav-home">Home</a></li>
-<li>
-<a href="/problems/" class="nav-problem">
-Problems
-</a>
-</li>
-<li>
-<a href="/submissions/" class="nav-submit">
-Submissions
-</a>
-</li>
-<li>
-<a href="/users/" class="nav-user">
-Users
-</a>
-</li>
-<li>
-<a href="/contests/" class="nav-contest">
-Contests
-</a>
-</li>
-<li>
-<a href="/about/" class="nav-about">
-About
-</a>
-<ul> <li>
-<a href="/status/" class="nav-status">
-Status
-</a>
-</li>
-<li>
-<a href="/tips/" class="nav-tips">
-Tips
-</a>
-</li>
-<li>
-<a href="/api/" class="nav-api">
-API
-</a>
-</li>
-<li>
-<a href="https://github.com/DMOJ" class="nav-github">
-Github
-</a>
-</li>
-</ul> </li>
-</ul>
-<span id="user-links">
-<span class="anon">
-<a href="/accounts/login/?next=">
-<b>Login</b>
-</a>&nbsp;|&nbsp;<a href="/accounts/register/">Register</a>
-</span>
-</span>
-</div>
-<div id="nav-shadow"></div>
-</nav>
-<div id="page-container">
-<noscript>
-        <div id="noscript">This site works best with JavaScript enabled.</div>
-    </noscript>
-<br>
-<main id="content">
-<h2 style="color:#393630; display:inline">
-Login </h2>
-<hr>
-<div id="content-body"> <div id="login-panel">
-<form action="" method="post" class="form-area">
-<input type='hidden' name='csrfmiddlewaretoken' value='f6EdZKRdlHpa7ZwidFtf2V12VyZWHsy4YLc4uBTn547apGN6gk7YZlZ3gOP45Bme' /> <table border="0" style="text-align:left">
-<tr>
-<th><i class="fa fa-user fa-fw"></i>
-</th>
-<td><input type="text" name="username" autofocus required placeholder="Username" id="id_username" maxlength="254" />
-</td>
-</tr>
-<tr>
-<th><i class="fa fa-key fa-fw"></i>
-</th>
-<td><input type="password" name="password" required placeholder="Password" id="id_password" />
-</td>
-</tr>
-</table>
-<hr>
-<button style="float:right;" type="submit">Login!</button>
-<input type="hidden" name="next" value="/src/539222/raw">
-</form>
-<br><a href="/accounts/password/reset/">Forgot your password?</a>
-<h4>Or log in with...</h4>
-<a href="/login/google-oauth2/?next=/src/539222/raw" class="social google-icon">
-<i class="fa fa-google-plus-square"></i>
-</a>
-<a href="/login/facebook/?next=/src/539222/raw" class="social facebook-icon">
-<i class="fa fa-facebook-square"></i>
-</a>
-<a href="/login/github-secure/?next=/src/539222/raw" class="social github-icon">
-<i class="fa fa-github-square"></i>
- </a>
-<a href="/login/dropbox-oauth2/?next=/src/539222/raw" class="social dropbox-icon">
-<i class="fa fa-dropbox"></i>
-</a>
-</div>
-</div>
-</main>
-<footer>
-<span id="footer-content">
-<br>
-<a style="color: rgb(128, 128, 128)" href="//github.com/DMOJ/">fork us on <span style="font-weight:bold">Github</span></a> | <a style="color: rgb(128, 128, 128);" href="//www.facebook.com/dmoj.ca">like us on <span style="font-weight: bold;">Facebook</span></a> | <a style="color: rgb(128, 128, 128)" href="https://translate.dmoj.ca/">help us <span style="font-weight: bold;">translate</span></a> | <a style="color: rgb(128, 128, 128)" href="https://dmoj.ca/tos/">terms of service</a> |
-<form action="/i18n/setlang/" method="post" style="display: inline">
-<input type='hidden' name='csrfmiddlewaretoken' value='f6EdZKRdlHpa7ZwidFtf2V12VyZWHsy4YLc4uBTn547apGN6gk7YZlZ3gOP45Bme' /> <input name="next" type="hidden" value="/accounts/login/?next=/src/539222/raw">
-<select name="language" onchange="form.submit()" style="height: 1.5em">
-<option value="de">
-Deutsch (de)
-</option>
-<option value="en" selected>
-English (en)
-</option>
-<option value="es">
-español (es)
-</option>
-<option value="fr">
-français (fr)
-</option>
-<option value="hr">
-Hrvatski (hr)
-</option>
-<option value="ko">
-??? (ko)
-</option>
-<option value="ro">
-Român? (ro)
-</option>
-<option value="ru">
-??????? (ru)
-</option>
-<option value="sr-latn">
-srpski (latinica) (sr-latn)
-</option>
-<option value="vi">
-Tiê?ng Viê?t (vi)
-</option>
-<option value="zh-hans">
-???? (zh-hans)
-</option>
-</select>
-</form>
-</span>
-</footer>
-</div>
-</body>
-</html>
+	for (int index_a = 1; index_a < cycleLength; index_a++)
+	{
+		int a = cycle[index_a];
+		if (G[a].size() < 3) continue;
+		for (int index_b = 0; index_b < index_a; index_b++)
+		{
+			int b = cycle[index_b];
+			if (G[b].size() < 3) continue;
+			for (const int &v1 : G[a])
+			{
+				if ((a == parent[v1] || v1 == parent[a]) && (find(cycle.begin(), cycle.end(), v1) != cycle.end())) continue;
+				for (const int &v2 : G[b])
+				{
+					if ((b == parent[v2] || v2 == parent[b]) && (find(cycle.begin(), cycle.end(), v2) != cycle.end())) continue;
+
+					//checks if G could have originated from fox graph
+					if (v1 != v2)
+					{
+						if (find(cycle.begin(), cycle.end(), v1) != cycle.end() && find(cycle.begin(), cycle.end(), v2) != cycle.end())
+						{
+							if (cycleLength > 4) return true;
+						}
+						else return true;
+					}
+					else if (cycleLength >= 5)
+						return true;
+					else if (cycleLength == 4 && (parent[a] == b || parent[b] == a))
+						return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+//true iff checkCycle returns true
+bool fox()
+{
+	stack.reserve(N);
+	stack.push_back(1);
+
+	while (!stack.empty())
+	{
+		int v = stack.back();
+		if (state[v] != 0) stack.pop_back();
+		else
+		{
+			bool allChildrenChecked = true;
+			for (const int &w : G[v])
+			{
+				if (state[w] == 0) //tree edge
+				{
+					parent[w] = v;
+					stack.push_back(w);
+					allChildrenChecked = false;
+				}
+				else if (state[w] == 1 && w != parent[v]) //back edge
+				{
+					int parent_w = parent[w];
+					parent[w] = v; //temporary
+					if (checkCycle(w, v)) return true;
+					parent[w] = parent_w;
+				}
+			}
+			if (allChildrenChecked)
+			{
+				state[v] = 2;
+				stack.pop_back();
+			}
+			else state[v] = 1;
+		}
+	}
+	return false;
+}
+
+int main()
+{
+	scanf("%d%d", &S, &T);
+	for (int i = 0; i < T; i++)
+	{
+		scanf("%d %d", &N, &M);
+		for (int j = 0; j < M; j++)
+		{
+			int a, b;
+			scanf("%d %d", &a, &b);
+			G[a].push_back(b);
+			G[b].push_back(a);
+		}
+		bool ans = false;
+		switch (S)
+		{
+			case 1:
+				memset(parent, 0, sizeof(parent[0]) * (N + 1));
+				memset(state, 0, sizeof(state[0]) * (N + 1));
+				stack.clear();
+				edgesInCycle.clear();
+				ans = flask();
+				break;
+			case 2:
+				ans = (M != N - 1); //a connected graph is a tree iff M=N-1
+				break;
+			case 3:
+				memset(parent, 0, sizeof(parent[0]) * (N + 1));
+				memset(state, 0, sizeof(state[0]) * (N + 1));
+				stack.clear();
+				edgesInCycle.clear();
+				ans = sun();
+				break;
+			case 4:
+				for (int i = 1; i <= N; i++)
+					if (G[i].size() >= 3)
+					{
+						ans = true; //true iff there exists a vertex with degree >= 3
+						break;
+					}
+				break;
+			case 5:
+				memset(parent, 0, 4 * (N + 1));
+				memset(state, 0, 4 * (N + 1));
+				stack.clear();
+				ans = fox();
+				break;
+		}
+		if (ans) printf("YES\n");
+		else printf("NO\n");
+		for (int i=1;i<=N;i++)
+			G[i].clear();
+	}
+	return 0;
+}

@@ -1,249 +1,131 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>Login - DMOJ: Modern Online Judge</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="keywords" content="DMOJ,Canadian,Don Mills,DMCI,online judge,programming,code,contest,CCC,CCC Solutions,CCC 2015,IOI,JOI,COCI,DMOPC,Canada,Ontario,Toronto,grade,interactive">
-<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
+#pragma GCC optimize("Ofast,no-stack-protector")
+#pragma GCC target("avx")
 
-<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
-<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
-<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
-<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
-<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
-<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
-<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
-<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
-<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
-<link rel="manifest" href="/manifest.json">
-<meta name="msapplication-TileColor" content="#FFBB33">
-<meta name="msapplication-TileImage" content="/mstile-144x144.png">
-<meta name="theme-color" content="#FFBB33">
-<meta property="og:site_name" content="DMOJ: Modern Online Judge">
-<meta property="og:url" content="https://dmoj.ca/accounts/login/?next=/src/801809/raw">
-<!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script>window.bad_browser = true</script>
-    <![endif]-->
-<link rel="stylesheet" href="//dmoj.algome.me/static/cache/css/5405fbc8cd00.css" type="text/css" /> <link rel="canonical" href="https://dmoj.ca/accounts/login/?next=/src/801809/raw">
-<style>
-        #login-panel {
-            position: relative;
-            margin: 5em auto auto -10em;
-            top: 40%;
-            left: 50%;
-        }
+#include <cmath>
+#include <cstdio>
+#include <utility>
+#include <vector>
+#include <algorithm>
+#define ll long long
+using namespace std;
 
-        h4 {
-            padding-top: 1em;
-        }
+class cd {
 
-        .social {
-            display: inline;
-            font-size: 2.3em;
-            float: none;
-        }
+private:
+	double x, y;
 
-        .google-icon i {
-            color: #DD4B38;
-        }
+public:
+	cd(double _x = 0.0, double _y = 0.0) {
+		x = _x;
+		y = _y;
+	}
+	double r() const { return x; }
+	double i() const { return y; }
+	double norm() const { return x * x + y * y; }
+	cd conj() const { return cd(this->x, -(this->y)); }
+	cd operator= (const cd& o) { this->x = o.x; this->y = o.y; return *this; }
+	cd operator+ (const cd& o) const { return cd(this->x + o.x, this->y + o.y); }
+	cd operator- (const cd& o) const { return cd(this->x - o.x, this->y - o.y); }
+	cd operator* (const cd& o) const { return cd(this->x*o.x - this->y*o.y, this->x*o.y + this->y*o.x); }
+	cd operator/ (const double& o) const { return cd(this->x / o, this->y / o); }
+	cd operator/ (const cd& o) const { return (*this)*(o.conj()) / (o.norm()); }
+	static cd exp(double theta) { return cd(cos(theta), sin(theta)); } // returns e^(i*theta)
+};
 
-        .facebook-icon i {
-            color: #133783;
-        }
+#define getchar() (*_pbuf ? *_pbuf++ : (_buf[fread_unlocked(_pbuf = _buf, 1, 16384, stdin)] = 0, *_pbuf++))
+char _buf[16385], *_pbuf = _buf;
 
-        .github-icon i {
-            color: black;
-        }
+const double pi = 4 * atan(1.0);
 
-        .dropbox-icon i {
-            color: #55ACEE;
-        }
-    </style>
-<script type="text/javascript" src="//dmoj.algome.me/static/cache/js/4f753e457100.js"></script>
-<script>window.user = {};</script>
-<script>window.user && Raven.setUserContext(window.user)</script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+//cd temp[1 << 21];
 
-  ga('create', 'UA-56757436-1', 'auto');
-  ga('require', 'displayfeatures');
-  ga('send', 'pageview');
+// a is a list of polynomial's coefficients - a[k] is the coefficient of x^k
+// N must be a power of 2
+void FFT(cd* a, int N, bool inverse) {
+	//base cases
+	if (N == 4) {
+		double sign = inverse ? 1.0 : -1.0;
+		cd a0 = a[0] + a[2] + a[1] + a[3];
+		cd a1 = a[0] - a[2] + cd(0, sign)*(a[1] - a[3]);
+		cd a2 = a[0] + a[2] - (a[1] + a[3]);
+		cd a3 = a[0] - a[2] - cd(0, sign)*(a[1] - a[3]);
+		a[0] = a0, a[1] = a1, a[2] = a2, a[3] = a3;
+		return;
+	}
+	vector<cd> temp;
+	temp.reserve(N / 2);
+	for (int i = 0; i < N / 2; i++) {
+		temp[i] = a[2 * i + 1];
+		a[i] = a[2 * i];
+	}
+	for (int i = 0; i < N / 2; i++)
+		a[i + N / 2] = temp[i];
+	// even-indexed elements get moved to the front half, odd to the back 
+	FFT(a, N / 2, inverse);
+	FFT(a + N / 2, N / 2, inverse);
+	cd w = cd::exp(-2 * pi / N); // primitive N-th root of unity
+	if (inverse)
+		w = w.conj();
+	cd wk(1, 0); // wk = w^k
+	for (int k = 0; k < N / 2; k++, wk = wk * w) {
+		cd even = a[k];
+		cd odd = a[k + N / 2];
+		a[k] = even + wk * odd;
+		a[k + N / 2] = even - wk * odd;
+	}
+}
 
-</script>
-<noscript>
-        <style>
-            #content {
-                margin: 80px auto auto;
-            }
+// a, b, c are arrays of size N
+// N is a power of 2
+// a and b are polynomial coefficients, degree at most N/2
+// second half of a and b must be zeros
+void multiply(cd* a, cd* b, cd* c, int N) {
+	FFT(a, N, false);
+	FFT(b, N, false);
+	for (int i = 0; i < N; i++)
+		c[i] = a[i] * b[i];
+	FFT(c, N, true);
+	for (int i = 0; i < N; i++) {
+		c[i] = c[i] / N;
+	}
+}
 
-            #navigation {
-                top: 27px;
-            }
-        </style>
-    </noscript>
-</head>
-<body>
-<nav id="navigation" class="unselectable">
-<div id="nav-container">
-<a id="navicon" href="javascript:void(0)"><i class="fa fa-bars"></i></a>
-<ul id="nav-list">
-<li class="home-nav-element"><a href="/"><img src="//dmoj.algome.me/static/icons/logo.d0dbdf0b98be.svg" alt="DMOJ" width="160" height="44" onerror="this.src=&quot;//dmoj.algome.me/static/icons/logo.2f426bc39826.png&quot;; this.onerror=null" style="border: none"></a></li>
-<li class="home-nav-element"><span class="nav-divider"></span></li>
-<li class="home-menu-item"><a href="/" class="nav-home">Home</a></li>
-<li>
-<a href="/problems/" class="nav-problem">
-Problems
-</a>
-</li>
-<li>
-<a href="/submissions/" class="nav-submit">
-Submissions
-</a>
-</li>
-<li>
-<a href="/users/" class="nav-user">
-Users
-</a>
-</li>
-<li>
-<a href="/contests/" class="nav-contest">
-Contests
-</a>
-</li>
-<li>
-<a href="/about/" class="nav-about">
-About
-</a>
-<ul> <li>
-<a href="/status/" class="nav-status">
-Status
-</a>
-</li>
-<li>
-<a href="/tips/" class="nav-tips">
-Tips
-</a>
-</li>
-<li>
-<a href="/api/" class="nav-api">
-API
-</a>
-</li>
-<li>
-<a href="https://github.com/DMOJ" class="nav-github">
-Github
-</a>
-</li>
-</ul> </li>
-</ul>
-<span id="user-links">
-<span class="anon">
-<a href="/accounts/login/?next=">
-<b>Login</b>
-</a>&nbsp;|&nbsp;<a href="/accounts/register/">Register</a>
-</span>
-</span>
-</div>
-<div id="nav-shadow"></div>
-</nav>
-<div id="page-container">
-<noscript>
-        <div id="noscript">This site works best with JavaScript enabled.</div>
-    </noscript>
-<br>
-<main id="content">
-<h2 style="color:#393630; display:inline">
-Login </h2>
-<hr>
-<div id="content-body"> <div id="login-panel">
-<form action="" method="post" class="form-area">
-<input type='hidden' name='csrfmiddlewaretoken' value='uahvcubpVGWeSIFxIKxwh4fPvZ8YxhVaU2d6gcpRkFvPG2ce55LPjk1aHP6eUtVa' /> <table border="0" style="text-align:left">
-<tr>
-<th><i class="fa fa-user fa-fw"></i>
-</th>
-<td><input type="text" name="username" autofocus required placeholder="Username" id="id_username" maxlength="254" />
-</td>
-</tr>
-<tr>
-<th><i class="fa fa-key fa-fw"></i>
-</th>
-<td><input type="password" name="password" required placeholder="Password" id="id_password" />
-</td>
-</tr>
-</table>
-<hr>
-<button style="float:right;" type="submit">Login!</button>
-<input type="hidden" name="next" value="/src/801809/raw">
-</form>
-<br><a href="/accounts/password/reset/">Forgot your password?</a>
-<h4>Or log in with...</h4>
-<a href="/login/google-oauth2/?next=/src/801809/raw" class="social google-icon">
-<i class="fa fa-google-plus-square"></i>
-</a>
-<a href="/login/facebook/?next=/src/801809/raw" class="social facebook-icon">
-<i class="fa fa-facebook-square"></i>
-</a>
-<a href="/login/github-secure/?next=/src/801809/raw" class="social github-icon">
-<i class="fa fa-github-square"></i>
- </a>
-<a href="/login/dropbox-oauth2/?next=/src/801809/raw" class="social dropbox-icon">
-<i class="fa fa-dropbox"></i>
-</a>
-</div>
-</div>
-</main>
-<footer>
-<span id="footer-content">
-<br>
-<a style="color: rgb(128, 128, 128)" href="//github.com/DMOJ/">fork us on <span style="font-weight:bold">Github</span></a> | <a style="color: rgb(128, 128, 128);" href="//www.facebook.com/dmoj.ca">like us on <span style="font-weight: bold;">Facebook</span></a> | <a style="color: rgb(128, 128, 128)" href="https://translate.dmoj.ca/">help us <span style="font-weight: bold;">translate</span></a> | <a style="color: rgb(128, 128, 128)" href="https://dmoj.ca/tos/">terms of service</a> |
-<form action="/i18n/setlang/" method="post" style="display: inline">
-<input type='hidden' name='csrfmiddlewaretoken' value='uahvcubpVGWeSIFxIKxwh4fPvZ8YxhVaU2d6gcpRkFvPG2ce55LPjk1aHP6eUtVa' /> <input name="next" type="hidden" value="/accounts/login/?next=/src/801809/raw">
-<select name="language" onchange="form.submit()" style="height: 1.5em">
-<option value="de">
-Deutsch (de)
-</option>
-<option value="en" selected>
-English (en)
-</option>
-<option value="es">
-español (es)
-</option>
-<option value="fr">
-français (fr)
-</option>
-<option value="hr">
-Hrvatski (hr)
-</option>
-<option value="ko">
-??? (ko)
-</option>
-<option value="ro">
-Român? (ro)
-</option>
-<option value="ru">
-??????? (ru)
-</option>
-<option value="sr-latn">
-srpski (latinica) (sr-latn)
-</option>
-<option value="vi">
-Tiê?ng Viê?t (vi)
-</option>
-<option value="zh-hans">
-???? (zh-hans)
-</option>
-</select>
-</form>
-</span>
-</footer>
-</div>
-</body>
-</html>
+int read(cd* a)
+{
+	int c, i = 0;
+	while ((c = getchar()) < '0');
+	do a[i++] = cd(c - '0', 0);
+	while ((c = getchar()) >= '0');
+	return i;
+}
+
+cd a[1 << 21], b[1 << 21], c[1 << 21];
+ll ans[1 << 21];
+
+int main() {
+	int asz, bsz; // size of arrays
+	asz = read(a);
+	bsz = read(b);
+	// if a = 0 or b = 0
+	if ((asz == 1 && a[0].r() == 0) || (bsz == 1 && b[0].r() == 0)) {
+		printf("0");
+		return 0;
+	}
+	for (int i = 0; i < asz / 2; i++)
+		swap(a[i], a[asz - 1 - i]);
+	for (int i = 0; i < bsz / 2; i++)
+		swap(b[i], b[bsz - 1 - i]);
+
+	int D = (int)ceil(log2(max(asz, bsz)) + 1);
+	multiply(a, b, c, 1 << D);
+	for (int i = 0; i < (1 << D); i++)
+		ans[i] = (ll)round(c[i].r());
+	for (int i = 0; i < (1 << D) - 1; i++) {
+		ans[i + 1] += ans[i] / 10;
+		ans[i] %= 10;
+	}
+	int d = (1 << D) - 1;
+	while (ans[d] == 0) --d;
+	while (d >= 0) printf("%lld", ans[d--]);
+	return 0;
+}

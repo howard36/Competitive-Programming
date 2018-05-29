@@ -1,249 +1,120 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>Login - DMOJ: Modern Online Judge</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="keywords" content="DMOJ,Canadian,Don Mills,DMCI,online judge,programming,code,contest,CCC,CCC Solutions,CCC 2015,IOI,JOI,COCI,DMOPC,Canada,Ontario,Toronto,grade,interactive">
-<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
+#include <vector>
+#include <algorithm>
+#include <tuple>
+#define ti3 tuple<int,int,int>
+#define mt make_tuple
+using namespace std;
 
-<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
-<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
-<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
-<link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
-<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
-<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
-<link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
-<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
-<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
-<link rel="manifest" href="/manifest.json">
-<meta name="msapplication-TileColor" content="#FFBB33">
-<meta name="msapplication-TileImage" content="/mstile-144x144.png">
-<meta name="theme-color" content="#FFBB33">
-<meta property="og:site_name" content="DMOJ: Modern Online Judge">
-<meta property="og:url" content="https://dmoj.ca/accounts/login/?next=/src/600633/raw">
-<!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script>window.bad_browser = true</script>
-    <![endif]-->
-<link rel="stylesheet" href="//dmoj.algome.me/static/cache/css/5405fbc8cd00.css" type="text/css" /> <link rel="canonical" href="https://dmoj.ca/accounts/login/?next=/src/600633/raw">
-<style>
-        #login-panel {
-            position: relative;
-            margin: 5em auto auto -10em;
-            top: 40%;
-            left: 50%;
-        }
+int gcd(int a, int b)
+{
+	while (b != 0)
+	{
+		int t = b;
+		b = a % b;
+		a = t;
+	}
+	return a;
+}
 
-        h4 {
-            padding-top: 1em;
-        }
+int A[100010];
+vector<ti3> SegmentTree(300000);
 
-        .social {
-            display: inline;
-            font-size: 2.3em;
-            float: none;
-        }
+//type: 0 = index of minimum in range, 1 = index of maximum in range, 2 = sum of range
+//b = beginning, e = end (inclusive)
+void BuildSegmentTree(int node, int b, int e)
+{
+	if (b == e)
+		SegmentTree[node] = make_tuple(A[b], A[b], 1);
+	else
+	{
+		int lIndex = 2 * node, rIndex = 2 * node + 1;
+		BuildSegmentTree(lIndex, b, (b + e) / 2);
+		BuildSegmentTree(rIndex, (b + e) / 2 + 1, e);
 
-        .google-icon i {
-            color: #DD4B38;
-        }
+		ti3 lContent = SegmentTree[lIndex], rContent = SegmentTree[rIndex];
+		SegmentTree[node] = mt(min(get<0>(lContent), get<0>(rContent)), gcd(get<1>(lContent), get<1>(rContent)), 0);
+		if (get<1>(lContent) == get<1>(SegmentTree[node]))
+			get<2>(SegmentTree[node]) += get<2>(lContent);
+		if (get<1>(rContent) == get<1>(SegmentTree[node]))
+			get<2>(SegmentTree[node]) += get<2>(rContent);
+	}
+}
 
-        .facebook-icon i {
-            color: #133783;
-        }
+//i = start of query range, j = end of query range (inclusive)
+ti3 SegmentTreeQuery(int node, int b, int e, int i, int j)
+{
+	if (i > e || j < b)	return mt(-1, 0, 0);	// interval does not intersect query interval
+	if (b >= i && e <= j)						// interval is inside query interval
+	{
+		return SegmentTree[node];
+	}
 
-        .github-icon i {
-            color: black;
-        }
+	ti3 p1 = SegmentTreeQuery(2 * node, b, (b + e) / 2, i, j);
+	ti3 p2 = SegmentTreeQuery(2 * node + 1, (b + e) / 2 + 1, e, i, j);
 
-        .dropbox-icon i {
-            color: #55ACEE;
-        }
-    </style>
-<script type="text/javascript" src="//dmoj.algome.me/static/cache/js/4f753e457100.js"></script>
-<script>window.user = {};</script>
-<script>window.user && Raven.setUserContext(window.user)</script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	if (get<0>(p1) == -1) return p2; // in case we try to access segment outside query
+	if (get<0>(p2) == -1) return p1;
 
-  ga('create', 'UA-56757436-1', 'auto');
-  ga('require', 'displayfeatures');
-  ga('send', 'pageview');
+	int _min = min(get<0>(p1), get<0>(p2));
+	int _gcd = gcd(get<1>(p1), get<1>(p2));
+	int numgcd = 0;
+	if (get<1>(p1) == _gcd)
+		numgcd += get<2>(p1);
+	if (get<1>(p2) == _gcd)
+		numgcd += get<2>(p2);
 
-</script>
-<noscript>
-        <style>
-            #content {
-                margin: 80px auto auto;
-            }
+	return mt(_min, _gcd, numgcd);
+}
 
-            #navigation {
-                top: 27px;
-            }
-        </style>
-    </noscript>
-</head>
-<body>
-<nav id="navigation" class="unselectable">
-<div id="nav-container">
-<a id="navicon" href="javascript:void(0)"><i class="fa fa-bars"></i></a>
-<ul id="nav-list">
-<li class="home-nav-element"><a href="/"><img src="//dmoj.algome.me/static/icons/logo.d0dbdf0b98be.svg" alt="DMOJ" width="160" height="44" onerror="this.src=&quot;//dmoj.algome.me/static/icons/logo.2f426bc39826.png&quot;; this.onerror=null" style="border: none"></a></li>
-<li class="home-nav-element"><span class="nav-divider"></span></li>
-<li class="home-menu-item"><a href="/" class="nav-home">Home</a></li>
-<li>
-<a href="/problems/" class="nav-problem">
-Problems
-</a>
-</li>
-<li>
-<a href="/submissions/" class="nav-submit">
-Submissions
-</a>
-</li>
-<li>
-<a href="/users/" class="nav-user">
-Users
-</a>
-</li>
-<li>
-<a href="/contests/" class="nav-contest">
-Contests
-</a>
-</li>
-<li>
-<a href="/about/" class="nav-about">
-About
-</a>
-<ul> <li>
-<a href="/status/" class="nav-status">
-Status
-</a>
-</li>
-<li>
-<a href="/tips/" class="nav-tips">
-Tips
-</a>
-</li>
-<li>
-<a href="/api/" class="nav-api">
-API
-</a>
-</li>
-<li>
-<a href="https://github.com/DMOJ" class="nav-github">
-Github
-</a>
-</li>
-</ul> </li>
-</ul>
-<span id="user-links">
-<span class="anon">
-<a href="/accounts/login/?next=">
-<b>Login</b>
-</a>&nbsp;|&nbsp;<a href="/accounts/register/">Register</a>
-</span>
-</span>
-</div>
-<div id="nav-shadow"></div>
-</nav>
-<div id="page-container">
-<noscript>
-        <div id="noscript">This site works best with JavaScript enabled.</div>
-    </noscript>
-<br>
-<main id="content">
-<h2 style="color:#393630; display:inline">
-Login </h2>
-<hr>
-<div id="content-body"> <div id="login-panel">
-<form action="" method="post" class="form-area">
-<input type='hidden' name='csrfmiddlewaretoken' value='hhU8pP4bOHYmCuEABKHfe84FMappTpqDmuhLvMdurQ53Ag7vVPalF6yNSeCcoE5L' /> <table border="0" style="text-align:left">
-<tr>
-<th><i class="fa fa-user fa-fw"></i>
-</th>
-<td><input type="text" name="username" autofocus required placeholder="Username" id="id_username" maxlength="254" />
-</td>
-</tr>
-<tr>
-<th><i class="fa fa-key fa-fw"></i>
-</th>
-<td><input type="password" name="password" required placeholder="Password" id="id_password" />
-</td>
-</tr>
-</table>
-<hr>
-<button style="float:right;" type="submit">Login!</button>
-<input type="hidden" name="next" value="/src/600633/raw">
-</form>
-<br><a href="/accounts/password/reset/">Forgot your password?</a>
-<h4>Or log in with...</h4>
-<a href="/login/google-oauth2/?next=/src/600633/raw" class="social google-icon">
-<i class="fa fa-google-plus-square"></i>
-</a>
-<a href="/login/facebook/?next=/src/600633/raw" class="social facebook-icon">
-<i class="fa fa-facebook-square"></i>
-</a>
-<a href="/login/github-secure/?next=/src/600633/raw" class="social github-icon">
-<i class="fa fa-github-square"></i>
- </a>
-<a href="/login/dropbox-oauth2/?next=/src/600633/raw" class="social dropbox-icon">
-<i class="fa fa-dropbox"></i>
-</a>
-</div>
-</div>
-</main>
-<footer>
-<span id="footer-content">
-<br>
-<a style="color: rgb(128, 128, 128)" href="//github.com/DMOJ/">fork us on <span style="font-weight:bold">Github</span></a> | <a style="color: rgb(128, 128, 128);" href="//www.facebook.com/dmoj.ca">like us on <span style="font-weight: bold;">Facebook</span></a> | <a style="color: rgb(128, 128, 128)" href="https://translate.dmoj.ca/">help us <span style="font-weight: bold;">translate</span></a> | <a style="color: rgb(128, 128, 128)" href="https://dmoj.ca/tos/">terms of service</a> |
-<form action="/i18n/setlang/" method="post" style="display: inline">
-<input type='hidden' name='csrfmiddlewaretoken' value='hhU8pP4bOHYmCuEABKHfe84FMappTpqDmuhLvMdurQ53Ag7vVPalF6yNSeCcoE5L' /> <input name="next" type="hidden" value="/accounts/login/?next=/src/600633/raw">
-<select name="language" onchange="form.submit()" style="height: 1.5em">
-<option value="de">
-Deutsch (de)
-</option>
-<option value="en" selected>
-English (en)
-</option>
-<option value="es">
-español (es)
-</option>
-<option value="fr">
-français (fr)
-</option>
-<option value="hr">
-Hrvatski (hr)
-</option>
-<option value="ko">
-??? (ko)
-</option>
-<option value="ro">
-Român? (ro)
-</option>
-<option value="ru">
-??????? (ru)
-</option>
-<option value="sr-latn">
-srpski (latinica) (sr-latn)
-</option>
-<option value="vi">
-Tiê?ng Viê?t (vi)
-</option>
-<option value="zh-hans">
-???? (zh-hans)
-</option>
-</select>
-</form>
-</span>
-</footer>
-</div>
-</body>
-</html>
+//does not update array itself
+void UpdateSegmentTree(int node, int b, int e, int index, int value)
+{
+	if (b>index || e<index) return;
+	if (b == e)
+	{
+		SegmentTree[node] = mt(value, value, 1);
+		return;
+	}
+
+	int lIndex = 2 * node, rIndex = 2 * node + 1;
+	UpdateSegmentTree(lIndex, b, (b + e) / 2, index, value);
+	UpdateSegmentTree(rIndex, (b + e) / 2 + 1, e, index, value);
+
+	ti3 lContent = SegmentTree[lIndex], rContent = SegmentTree[rIndex];
+	SegmentTree[node] = mt(min(get<0>(lContent), get<0>(rContent)), gcd(get<1>(lContent), get<1>(rContent)), 0);
+	if (get<1>(lContent) == get<1>(SegmentTree[node]))
+		get<2>(SegmentTree[node]) += get<2>(lContent);
+	if (get<1>(rContent) == get<1>(SegmentTree[node]))
+		get<2>(SegmentTree[node]) += get<2>(rContent);
+}
+
+int main()
+{
+	int n, m;
+	scanf("%d %d", &n, &m);
+	for (int i = 1; i <= n; i++)
+		scanf("%d", &A[i]);
+	BuildSegmentTree(1, 1, n);
+
+	char c; int a, b;
+	for (int i = 0; i < m; i++)
+	{
+		scanf(" %c %d %d", &c, &a, &b);
+		switch (c)
+		{
+			case 'C':
+				UpdateSegmentTree(1, 1, n, a, b);
+				break;
+			case 'M':
+				printf("%d\n", get<0>(SegmentTreeQuery(1, 1, n, a, b)));
+				break;
+			case 'G':
+				printf("%d\n", get<1>(SegmentTreeQuery(1, 1, n, a, b)));
+				break;
+			case 'Q':
+				printf("%d\n", get<2>(SegmentTreeQuery(1, 1, n, a, b)));
+				break;
+		}
+	}
+    return 0;
+}
