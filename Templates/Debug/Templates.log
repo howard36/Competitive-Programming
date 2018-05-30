@@ -1,0 +1,6 @@
+﻿  Fast Input.cpp
+c:\users\howard halim\documents\programs\templates\templates\fast input.cpp(10): warning C4005: 'scan': macro redefinition
+  c:\users\howard halim\documents\programs\templates\templates\fast input.cpp(4): note: see previous definition of 'scan'
+c:\users\howard halim\documents\programs\templates\templates\fast input.cpp(14): warning C4005: 'getchar': macro redefinition
+  c:\users\howard halim\documents\programs\templates\templates\fast input.cpp(2): note: see previous definition of 'getchar'
+c:\users\howard halim\documents\programs\templates\templates\fast input.cpp(29): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?

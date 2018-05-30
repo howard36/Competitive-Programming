@@ -1,2 +1,2 @@
-# DMOJ
-My solutions to the DMOJ problems that I've solved.
+# Competitive Programming
+My submissions to the DMOJ, Codeforces, and USACO problems that I've done.
