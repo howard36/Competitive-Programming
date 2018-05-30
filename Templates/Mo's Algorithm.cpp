@@ -1,6 +1,4 @@
-#include "stdafx.h"
-
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
 
 int N, Q, blocksize;
@@ -14,6 +12,6 @@ bool Mo(query a, query b) {
 }
 
 int main() {
-
-	blocksize = max((int)(N / sqrt(2 * Q)), 1); //guarantees at most N*sqrt(2Q) shifts
+	int blocksize = max((int)(N / sqrt(2 * Q)), 1); //guarantees at most N*sqrt(2Q) shifts
+	return 0;
 }

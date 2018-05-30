@@ -14,8 +14,7 @@ char _;
 #define getchar() (*_pbuf ? *_pbuf++ : (_buf[fread_unlocked(_pbuf = _buf, 1, 16384, stdin)] = 0, *_pbuf++))
 char _buf[16385], *_pbuf = _buf;
 
-int read()
-{
+int read() {
 	int c, o = 0;
 	while ((c = getchar()) < '0');
 	do o = (o << 3) + (o << 1) + c - '0';

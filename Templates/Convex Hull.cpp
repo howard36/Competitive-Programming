@@ -1,8 +1,4 @@
-#include "stdafx.h"
-
-#include <vector>
-#include <algorithm>
-#include <complex>
+#include <bits/stdc++.h>
 #define cd complex<double>
 using namespace std;
 

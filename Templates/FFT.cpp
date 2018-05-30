@@ -1,9 +1,4 @@
-#include "stdafx.h"
-
-#include <iostream>
-#include <cmath>
-#include <utility>
-#include <vector>
+#include <bits/stdc++.h>
 #define ll long long
 using namespace std;
 
@@ -30,9 +25,6 @@ public:
 	static cd exp(double theta) { return cd(cos(theta), sin(theta)); } // returns e^(i*theta)
 };
 
-#define getchar() (*_pbuf ? *_pbuf++ : (_buf[fread_unlocked(_pbuf = _buf, 1, 16384, stdin)] = 0, *_pbuf++))
-char _buf[16385], *_pbuf = _buf;
-
 const double pi = 4 * atan(1.0);
 
 // a is a list of polynomial's coefficients - a[k] is the coefficient of x^k
@@ -48,7 +40,7 @@ void FFT(cd* a, int N, bool inverse) {
 	}
 	for (int i = 0; i < N / 2; i++)
 		a[i + N / 2] = temp[i];
-	// even-indexed elements get moved to the front half, odd to the back 
+	// even-indexed elements get moved to the front half, odd to the back
 	FFT(a, N / 2, inverse);
 	FFT(a + N / 2, N / 2, inverse);
 	cd w = cd::exp(-2 * pi / N); // primitive N-th root of unity
@@ -80,11 +72,11 @@ void multiply(cd* a, cd* b, cd* c, int N) {
 
 int main() {
 	const int N = 4;
-	cd a[N] = { 1.0, 2.0, 0, 0 };// , 0, 0, 0, 0
-	cd b[N] = { 5.0, 6.0, 0, 0 };//, 0, 0, 0, 0 };
+	cd a[N] = { 1.0, 2.0, 0, 0 };
+	cd b[N] = { 5.0, 6.0, 0, 0 };
 	cd c[N];
-	multiply(a, b, c, N);
+	multiply(a, b, c, N); // (2x + 1)(6x + 5) = 12x^2 + 16x + 5
 	for (int i = 0; i < N; i++) {
-		cout << c[i].r() << ', ' << c[i].i() << endl;
+		cout << c[i].r() << ", " << c[i].i() << endl;
 	}
 }

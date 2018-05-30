@@ -1,9 +1,4 @@
-#include "stdafx.h"
-
-#include <cstdio>
-#include <cmath>
-#include <vector>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
 
 
@@ -19,31 +14,26 @@ int segsize[MAXN];
 bool modified[MAXN];
 
 //apply modification to node
-void apply(int i, int p)
-{
+void apply(int i, int p) {
 	segtree[i].max = p;
 	segtree[i].sum = p * segsize[i];
-	if (i < N)
-	{
+	if (i < N) {
 		segtree[i].lazy = p;
 		modified[i] = true;
 	}
 }
 
 //merges two nodes into one
-node merge(node a, node b)
-{
-	return node{
+node merge(node a, node b) {
+	return node {
 		max(a.max,b.max),
 		a.sum + b.sum
 	};
 }
 
 //pushes the modification down from i to its children
-void push(int i)
-{
-	if (modified[i])
-	{
+void push(int i) {
+	if (modified[i]) {
 		apply(i << 1, segtree[i].lazy);
 		apply(i << 1 | 1, segtree[i].lazy);
 		modified[i] = false;
@@ -51,8 +41,7 @@ void push(int i)
 }
 
 //pushes all modifications on the border of the interval down, so they don't interfere with update or query
-void pushDown(int i)
-{
+void pushDown(int i) {
 	int k;
 	for (k = 0; (i >> k) > 0; k++);
 	for (k--; k > 0; k--)
@@ -60,10 +49,8 @@ void pushDown(int i)
 }
 
 //update node based on values of its children
-void pop(int i)
-{
-	if (modified[i])
-	{
+void pop(int i) {
+	if (modified[i]) {
 		segtree[i].max = segtree[i].lazy;
 		segtree[i].sum = segtree[i].lazy * segsize[i];
 	}
@@ -72,17 +59,14 @@ void pop(int i)
 }
 
 //update all nodes on the border of the interval
-void popUp(int i)
-{
+void popUp(int i) {
 	for (i >>= 1; i > 0; i >>= 1)
 		pop(i);
 }
 
-void init()
-{
+void init() {
 	int a;
-	for (int i = N; i < N << 1; i++)
-	{
+	for (int i = N; i < N << 1; i++) {
 		//initialize leaves of segtree from input
 		scanf("%d", &a);
 		segtree[i] = node{ a,a,1 };
@@ -96,8 +80,7 @@ void init()
 		segsize[i] = segsize[i << 1] + segsize[i << 1 | 1];
 }
 
-void update(int L, int R, int p)
-{
+void update(int L, int R, int p) {
 	L += N;
 	R += N;
 
@@ -109,8 +92,7 @@ void update(int L, int R, int p)
 
 	//splits interval into disjoint intervals each covered by a segtree node
 	//then applies update to each node
-	for (; L <= R; L = (L + 1) >> 1, R = (R - 1) >> 1)
-	{
+	for (; L <= R; L = (L + 1) >> 1, R = (R - 1) >> 1) {
 		if (L & 1)
 			apply(L, p);
 		if (!(R & 1))
@@ -121,8 +103,7 @@ void update(int L, int R, int p)
 	popUp(RCopy);
 }
 
-node query(int L, int R)
-{
+node query(int L, int R) {
 	L += N;
 	R += N;
 
@@ -134,8 +115,7 @@ node query(int L, int R)
 	//splits interval into disjoint intervals each covered by a segtree node
 	//then merges all nodes into ret
 	//if merge is non-commutative, use retL and retR, then merge at the end
-	for (; L <= R; L = (L + 1) >> 1, R = (R - 1) >> 1)
-	{
+	for (; L <= R; L = (L + 1) >> 1, R = (R - 1) >> 1) {
 		if (L & 1)
 			ret = merge(ret, segtree[L]);
 		if (!(R & 1))
@@ -153,23 +133,19 @@ node query(int L, int R)
 
 vector<int> SegmentTree;
 
-void InitSegmentTree(int size)
-{
+void InitSegmentTree(int size) {
 	int length = (int)pow(2.0, ceil(log((double)size) / log(2.0)) + 1);
 	SegmentTree.resize(length, 0);
 }
 
 //type: 0 = index of minimum in range, 1 = index of maximum in range, 2 = sum of range
 //b = beginning, e = end (inclusive)
-void BuildSegmentTree(int type, int A[], int node, int b, int e)
-{
-	if (b == e)
-	{
+void BuildSegmentTree(int type, int A[], int node, int b, int e) {
+	if (b == e) {
 		if (type == 2) SegmentTree[node] = A[b];
 		else SegmentTree[node] = b;
 	}
-	else
-	{
+	else {
 		int lIndex = 2 * node, rIndex = 2 * node + 1;
 		BuildSegmentTree(type, A, lIndex, b, (b + e) / 2);
 		BuildSegmentTree(type, A, rIndex, (b + e) / 2 + 1, e);
@@ -204,8 +180,7 @@ int SegmentTreeQuery(int type, int A[], int node, int b, int e, int i, int j)
 	if (p1 == -1) return p2; // in case we try to access segment outside query
 	if (p2 == -1) return p1;
 
-	switch (type)
-	{
+	switch (type) {
 		case 0:
 			if (A[p1] < A[p2]) return p1;
 			else return p2;
@@ -224,8 +199,7 @@ int SegmentTreeQuery(int type, int A[], int node, int b, int e, int i, int j)
 void UpdateSegmentTree(int type, int node, int b, int e, int index, int value)
 {
 	if (b>index || e<index) return;
-	if (b == e)
-	{
+	if (b == e)	{
 		SegmentTree[node] = value;
 		return;
 	}
@@ -234,8 +208,7 @@ void UpdateSegmentTree(int type, int node, int b, int e, int index, int value)
 	UpdateSegmentTree(type, lIndex, b, (b + e) / 2, index, value);
 	UpdateSegmentTree(type, rIndex, (b + e) / 2 + 1, e, index, value);
 
-	switch (type)
-	{
+	switch (type) {
 		case 0:
 			SegmentTree[node] = min(SegmentTree[lIndex], SegmentTree[rIndex]);
 			break;
