@@ -44,7 +44,6 @@ subs = requests.get("https://dmoj.ca/api/user/submissions/"+username).json() # a
 #remove submissions with compile errors or aborted submissions, because those can have null time, points, or memory
 subs = {i:subs[i] for i in subs if subs[i]["status"] == "D"}
 
-#get all problems so you don't have to make as many api calls
 problems = requests.get("https://dmoj.ca/api/problem/list").json() # a map from problem name to the problem data
 
 best = {} # a map from problem name to the submission id of the best submission
@@ -60,7 +59,7 @@ for name in groups:
 count = 0
 for p in best:
     r = getSubmission(best[p]) # the code
-    # time.sleep(1)
+    time.sleep(0.2) # 5 API calls per second
     saveProblem(problems[p]['group'], problems[p]['name'], subs[best[p]]['language'],r)
     count+=1
     if (count%10==0): print(count)
