@@ -23,7 +23,7 @@ int read() {
 }
 
 //when using iostream, add this at start of main
-ios::sync_with_stdio(false);
+ios::sync_with_stdio(false); // this doesn't work with strings!
 cin.tie(0);
 
 // for general optimization
