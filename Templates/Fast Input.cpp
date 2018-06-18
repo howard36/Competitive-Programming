@@ -29,3 +29,9 @@ cin.tie(0);
 // for general optimization
 #pragma GCC optimize("Ofast,no-stack-protector")
 #pragma GCC target("avx")
+
+#pragma warning(disable:4996)
+#pragma comment(linker, "/STACK:336777216")
+#pragma comment(linker, "/stack:227420978")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
+#pragma GCC optimize("O3")
