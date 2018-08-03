@@ -6,7 +6,7 @@
     "isBackground": true,
     "tasks": [
         {
-            "label": "Build C++",
+            "label": "Build And Run C++",
             "command": "cd",
             "args": [
                 "${fileDirname}",
@@ -23,6 +23,19 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "Build C++",
+            "command": "cd",
+            "args": [
+                "${fileDirname}",
+                ";",
+                "g++",
+                "-g",
+                "${fileBasename}",
+                "-o",
+                "${fileBasenameNoExtension}.exe",
+            ]
         }
     ]
 }
