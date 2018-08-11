@@ -25,6 +25,7 @@ int read() {
 //when using iostream, add this at start of main
 ios::sync_with_stdio(false); // this doesn't work with strings!
 cin.tie(0);
+cout.tie(0);
 
 // for general optimization
 #pragma GCC optimize("Ofast,no-stack-protector")
@@ -35,3 +36,6 @@ cin.tie(0);
 #pragma comment(linker, "/stack:227420978")
 #pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
 #pragma GCC optimize("O3")
+
+#pragma GCC optimize("Ofast")
+#pragma GCC target("sse4")
