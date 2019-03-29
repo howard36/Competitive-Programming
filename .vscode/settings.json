@@ -61,7 +61,8 @@
         "type_traits": "cpp",
         "tuple": "cpp",
         "typeindex": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "string": "cpp"
     },
     "python.pythonPath": "/usr/bin/python3"
 }

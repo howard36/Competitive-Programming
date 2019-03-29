@@ -9,15 +9,15 @@
             "label": "Build And Run C++",
             "command": "cd",
             "args": [
-                "${fileDirname}",
-                ";",
+                "\"${fileDirname}\"",
+                "&&",
                 "g++",
                 "-g",
-                "${fileBasename}",
+                "\"${fileBasename}\"",
                 "-o",
-                "${fileBasenameNoExtension}.exe",
-                ";",
-                "./${fileBasenameNoExtension}.exe"
+                "\"${fileBasenameNoExtension}.exe\"",
+                "&&",
+                "\"./${fileBasenameNoExtension}.exe\""
             ],
             "group": {
                 "kind": "build",
@@ -28,14 +28,15 @@
             "label": "Build C++",
             "command": "cd",
             "args": [
-                "${fileDirname}",
+                "\"${fileDirname}\"",
                 ";",
                 "g++",
                 "-g",
-                "${fileBasename}",
+                "\"${fileBasename}\"",
                 "-o",
-                "${fileBasenameNoExtension}.exe",
-            ]
+                "\"${fileBasenameNoExtension}.exe\""
+            ],
+            "group": "build"
         }
     ]
 }
