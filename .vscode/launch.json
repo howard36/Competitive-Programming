@@ -18,7 +18,7 @@
             "name": "Debug C++",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/home/howard/Documents/CP/Codeforces/1114/F.exe",
+            "program": "/home/howard/Documents/CP/DMOJ/Uncategorized/Balanced Bracket Sequence.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "/home/howard/Documents/CP/DMOJ/FHC",
