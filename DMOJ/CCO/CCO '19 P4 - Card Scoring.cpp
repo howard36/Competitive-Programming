@@ -1,18 +1,18 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-double dp[1000006];
+double dp[1000006], power[1000006];
 int a[1000006], f[1000006], c[1000006], last[1000006], back[1000006];
 vector<int> s[1000006];
 int k, n;
 
 double ff(int i, int j) {
-	return dp[j-1] + pow(c[i]-c[j]+1, 0.5*k);
+	return dp[j-1] + power[c[i]-c[j]+1];
 }
 
 double split(int j1, int j2) {
-	double d1 = dp[j1-1] + pow(c[j1] - 1, 0.5*k);
-	double d2 = dp[j2-1] + pow(c[j2] - 1, 0.5*k);
+	double d1 = dp[j1-1] + power[c[j1] - 1];
+	double d2 = dp[j2-1] + power[c[j2] - 1];
 	double c1 = 2.0 * (c[j1] - 1);
 	double c2 = 2.0 * (c[j2] - 1);
 	return (d2 - d1) / (c2 - c1);
@@ -24,6 +24,8 @@ int main() {
 		printf("%d", n);
 		return 0;
 	}
+    for (int i = 1; i<=n; i++)
+        power[i] = pow(i, 0.5*k);
 	for (int i = 1; i<=n; i++) {
 		scanf("%d", &a[i]);
 		f[a[i]]++;
