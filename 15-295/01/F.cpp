@@ -37,10 +37,10 @@ int main() {
 	sort(f, f+n);
 	int L = 0, R = n-1, r = n-1;
 	for (int l = 0; l < n-1; l++) {
-//		if (r == l)
-//			r++; // annoying edge case
-//		while (r-1 > l && diff(prob(l, r-1), prob(l, r)) >= 0)
-//			r--;
+		if (r == l)
+			r++; // annoying edge case
+		while (r-1 > l && diff(prob(l, r-1), prob(l, r)) >= 0)
+			r--;
 		if (diff(prob(l, l+1), prob(L, R)) > 0) {
 			L = l;
 			R = l+1;
