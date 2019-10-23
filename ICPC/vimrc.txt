@@ -10,3 +10,4 @@ set shiftwidth=4
 set incsearch
 set hlsearch
 set showmatch
+set mouse=a
