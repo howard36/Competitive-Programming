@@ -31,7 +31,6 @@ cd circumcenter(cd a, cd b, cd c) {
 	return (b*norm(c) - c*norm(b))/(b*conj(c) - c*conj(b)) + a;
 }
 
-
 // Convex Hull
 
 bool cmpAngle(cd a, cd b) { return arg(a / b) < 0; }
