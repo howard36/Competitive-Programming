@@ -27,7 +27,7 @@ vector<cd> ConvexHull(vector<cd> points) {
 		cd a = hull[hull.size() - 2];
 		cd b = hull[hull.size() - 1];
 		cd c = points[i];
-		while (arg((a - b) / (c - b)) <= 0) {  // If angle ABC is concave, remove B
+		while (imag((a - b) / (c - b)) <= 0) {  // If angle ABC is concave, remove B
 			hull.pop_back();
 			a = hull[hull.size() - 2];
 			b = hull[hull.size() - 1];
