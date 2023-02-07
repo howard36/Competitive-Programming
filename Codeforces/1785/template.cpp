@@ -9,7 +9,6 @@ using namespace std;
 #define all(v) v.begin(), v.end()
 #define sz(v) (int)v.size()
 
-#define FAST ios::sync_with_stdio(0); cin.tie(0);
 #define finish(x) return cout << x << '\n', 0;
 #define dbg(x) cerr << ">>> " << #x << " = " << x << "\n";
 #define _ << " _ " <<
@@ -21,14 +20,19 @@ typedef pair<int,int> pi;
 typedef pair<ld,ld> pd;
 typedef complex<ld> cd;
 
-int solve() {
-    
+void solve() {
+    int n;
+    cin >> n;
+    for (int i = 0; i < n; i++) {
+        
+    }
 }
 
-int main() { FAST
+int main() {
+    ios::sync_with_stdio(0); cin.tie(0);
     int t = 1;
     cin >> t;
     while (t--) {
-        cout << solve() << endl;
+        solve();
     }
 }
