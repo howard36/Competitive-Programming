@@ -26,13 +26,8 @@ typedef pair<int,int> pi;
 typedef pair<ld,ld> pd;
 typedef complex<ld> cd;
 
-void solve() {
-    int n;
-    cin >> n;
-    
-}
-
 int main() { FAST
+    int p = ;
     int t = 1;
     cin >> t;
     while (t--) {

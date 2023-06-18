@@ -26,16 +26,32 @@ typedef pair<int,int> pi;
 typedef pair<ld,ld> pd;
 typedef complex<ld> cd;
 
-void solve() {
-    int n;
-    cin >> n;
-    
-}
+const ll MOD = 998244353LL;
+
+ll a[5][100005];
 
 int main() { FAST
-    int t = 1;
-    cin >> t;
-    while (t--) {
-        solve();
+    ll n;
+    cin >> n;
+
+    vi nums;
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> a[i][j];
+            a[i][j] = 5 * a[i][j] + i;
+            nums.pb(a[i][j]);
+        }
     }
+    
+    sort(all(nums));
+
+    ll ans = 0;
+    for (ll i = 0; i < 5*n; i++) {
+        ll r = 5*n - 1 - i;
+        ll l2 = (i * (i-1) / 2) % MOD;
+        ll r2 = (r * (r-1) / 2) % MOD;
+        dbg(i _ r _ l2 _ r2 _ (nums[i] / 5))
+        ans = (ans + (l2 * r2 % MOD) * (nums[i] / 5) % MOD) % MOD;
+    }
+    cout << ans;
 }
